@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="rdcdevs.sftp.wpengine.com" id="e2d79ff8-4d9a-4cff-aedf-99a6fbb4e0c4" port="2222" nameFormat="DESCRIPTIVE" username="rdcdevs-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="nwdevs.sftp.wpengine.com" id="8eee611e-1a05-4b7f-a1de-66864e08cc47" port="2222" nameFormat="DESCRIPTIVE" username="nwdevs-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="iogldev.sftp.wpengine.com" id="9da3a4e0-b59a-44aa-96b6-a62983ee9737" port="2222" nameFormat="DESCRIPTIVE" username="iogldev-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="ioglstaging.sftp.wpengine.com" id="e32855a3-eb0e-4e07-b0be-18e6001e580d" port="2222" nameFormat="DESCRIPTIVE" username="ioglstaging-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="nw2018wpe.sftp.wpengine.com" id="1f4fcc1a-276a-49d6-b718-2b89438a0369" port="2222" nameFormat="DESCRIPTIVE" username="nw2018wpe-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="rdc2018.sftp.wpengine.com" id="c8a18fea-b6e6-49fc-ab32-4887d342ba81" port="2222" nameFormat="DESCRIPTIVE" username="rdc2018-chuck" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>

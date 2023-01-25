@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="f14cc5d0-4407-4662-8e76-56efa1f9d6db" name="Utility Plugin Main" url="http://localhost">
+        <fileTransfer mountedRoot="C:\Users\charles.mcmackin\Documents\Projects\Website\Glidewell Utility Plugin\glidewell-utility\modules" accessType="MOUNT" port="0" />
+      </webServer>
+    </option>
+  </component>
+</project>

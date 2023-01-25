@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="On explicit save action" serverName="Utility Plugin Main" preserveTimestamps="false" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+    <serverData>
+      <paths name="Utility Plugin Main">
+        <serverdata>
+          <mappings>
+            <mapping deploy="\" local="$PROJECT_DIR$" web="/" />
+            <mapping local="$PROJECT_DIR$/../../Common Plugins" web="/" />
+            <mapping local="$PROJECT_DIR$/../../Glidewell Utility Plugin/glidewell-utility" web="/" />
+            <mapping local="$PROJECT_DIR$/../../WordPress Core" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/../../Glidewell Utility Plugin/glidewell-utility" />
+            <excludedPath local="true" path="$PROJECT_DIR$/../../Common Plugins" />
+            <excludedPath local="true" path="$PROJECT_DIR$/../../WordPress Core" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ON_EXPLICIT_SAVE" />
+  </component>
+</project>
