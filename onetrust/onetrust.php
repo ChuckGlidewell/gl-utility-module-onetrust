@@ -16,11 +16,16 @@ const OPTION_FB_PIXEL_ID = 'tag_id_facebook_pixel';
 
 
 const OPTION_ONETRUST_ENABLED = 'onetrust_enabled';
+const OPTION_ONETRUST_DOMAIN_ID = 'onetrust_domain_id';
+const OPTION_ONETRUST_AUTO_BLOCK = 'onetrust_auto_blocking';
 const OPTION_ONETRUST_GROUP_NECESSARY = 'onetrust_group_id_necessary';
 const OPTION_ONETRUST_GROUP_PERFORMANCE = 'onetrust_group_id_performance';
 const OPTION_ONETRUST_GROUP_FUNCTIONAL = 'onetrust_group_id_functional';
 const OPTION_ONETRUST_GROUP_TARGETING = 'onetrust_group_id_targeting';
 const OPTION_ONETRUST_GROUP_SOCIAL = 'onetrust_group_id_social';
+
+const OPTION_ONETRUST_DEBUG_MODE = 'onetrust_debug_mode';
+const OPTION_ONETRUST_DEBUG_DOMAIN = 'onetrust_debug_domain';
 //</editor-fold> Constants
 
 //--------------------------------------------

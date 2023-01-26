@@ -26,13 +26,19 @@ function populate_settings($settings) {
         $settings[] = new Gdwl_Setting_Text('Facebook Pixel ID', OneTrust\OPTION_FB_PIXEL_ID, OneTrust\OPTION_FB_PIXEL_ID, '', 'The Facebook Pixel ID for this site', 'integration');
 
         // OneTrust Cookie Banner
-        //$settings[] = new Gdwl_Setting_Text('', '', '', '', '', 'onetrust');
+        //$settings[] = new Gdwl_Setting_Text('', '', '', '', '', 'onetrust'); OPTION_ONETRUST_AUTO_BLOCK
         $settings[] = new Gdwl_Setting_Toggle('Enabled', OneTrust\OPTION_ONETRUST_ENABLED, OneTrust\OPTION_ONETRUST_ENABLED, false, 'Determines if the OneTrust Cookie Banner integration is enabled and processing. Only toggle this on AFTER setting up the necessary tags', 'onetrust');
+        $settings[] = new Gdwl_Setting_Text('Domain ID', OneTrust\OPTION_ONETRUST_DOMAIN_ID, OneTrust\OPTION_ONETRUST_DOMAIN_ID, '', 'The ID Key that is used to identify this domain in OneTrust. You can find this by looking at the "data-domain-script" attribute of the production script for your domain.', 'onetrust');
+        $settings[] = new Gdwl_Setting_Toggle('Tag Auto-Blocking Enabled', OneTrust\OPTION_ONETRUST_AUTO_BLOCK, OneTrust\OPTION_ONETRUST_AUTO_BLOCK, true, 'Determines if Auto-Blocking of tags is enabled for the OneTrust cookie banner', 'onetrust');
         $settings[] = new Gdwl_Setting_Text('Group ID - Strictly Necessary Cookies', OneTrust\OPTION_ONETRUST_GROUP_NECESSARY, OneTrust\OPTION_ONETRUST_GROUP_NECESSARY, 'C0001', 'Group ID for the "Strictly Necessary" cookies group.', 'onetrust');
         $settings[] = new Gdwl_Setting_Text('Group ID - Functional Cookies', OneTrust\OPTION_ONETRUST_GROUP_FUNCTIONAL, OneTrust\OPTION_ONETRUST_GROUP_FUNCTIONAL, 'C0003', 'Group ID for the "Functional" cookies group', 'onetrust');
         $settings[] = new Gdwl_Setting_Text('Group ID - Performance Cookies', OneTrust\OPTION_ONETRUST_GROUP_PERFORMANCE, OneTrust\OPTION_ONETRUST_GROUP_PERFORMANCE, 'C0002', 'Group ID for the "Performance" cookies group', 'onetrust');
         $settings[] = new Gdwl_Setting_Text('Group ID - Targeting Cookies', OneTrust\OPTION_ONETRUST_GROUP_TARGETING, OneTrust\OPTION_ONETRUST_GROUP_TARGETING, 'C0004', 'Group ID for the "Targeting" cookies group', 'onetrust');
         $settings[] = new Gdwl_Setting_Text('Group ID - Social Media Cookies', OneTrust\OPTION_ONETRUST_GROUP_SOCIAL, OneTrust\OPTION_ONETRUST_GROUP_SOCIAL, 'C0005', 'Group ID for the "Social Media" cookies group', 'onetrust');
+
+        // OneTrust Debugging
+        $settings[] = new Gdwl_Setting_Toggle('Debug Mode', OneTrust\OPTION_ONETRUST_DEBUG_MODE, OneTrust\OPTION_ONETRUST_DEBUG_MODE, false, 'If enabled, debug information will be output to the console and any cookies using the set original domain will be swapped to use the current domain.', 'onetrust-debug');
+        $settings[] = new Gdwl_Setting_Text('Debug Original Domain', OneTrust\OPTION_ONETRUST_DEBUG_DOMAIN, OneTrust\OPTION_ONETRUST_DEBUG_DOMAIN, '', 'The original domain that the cookies are registered to in OneTrust. Use this for staging/dev environments to test out cookie removal', 'onetrust-debug');
 
     }
     return $settings;
@@ -77,7 +83,12 @@ function tab_integrations() {
 function tab_onetrust() {
     ?>
     <h2>OneTrust Integration</h2>
-    <p>There will be more here later...</p>
+    <p>Leave these as their defaults unless you know what you're doing.</p>
 <?php
     gdwl()->settings()->output_controls('onetrust');
+    ?>
+    <h2>Debug Settings</h2>
+    <p>These settings allow you to debug the OneTrust functionality while on staging or development environments. Please revert these settings before deploying to production.</p>
+<?php
+    gdwl()->settings()->output_controls('onetrust-debug');
 }

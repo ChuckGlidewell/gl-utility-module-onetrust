@@ -26,6 +26,16 @@ class OneTrust {
      */
     public $is_enabled = false;
     /**
+     * The ID key that identifies this domain in OneTrust. Used for outputting the banner scripts.
+     * @var string
+     */
+    public $domain_id = '';
+    /**
+     * Determines if the OneTrust cookie banner has Auto-Blocking enabled
+     * @var bool
+     */
+    public $auto_blocking_enabled = true;
+    /**
      * The Group ID for Strictly Necessary cookies
      * @var string
      */
@@ -50,6 +60,17 @@ class OneTrust {
      * @var string
      */
     public $group_id_social = '';
+    /**
+     * Determines if the debug mode setting is enabled
+     * @var bool
+     */
+    public $is_debug_mode = false;
+    /**
+     * The original domain the cookies are registered under for use with debugging on staging/dev environments
+     * @var string
+     */
+    public $debug_domain = '';
+
     /**
      * The Hotjar ID for this site
      * @var string
@@ -86,11 +107,17 @@ class OneTrust {
 
         // OneTrust Settings Fields
         $this->is_enabled = Parsing\sanitize_bool(gdwl()->settings()->get_value_bool(OPTION_ONETRUST_ENABLED, false));
+        $this->domain_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_DOMAIN_ID, ''));
+        $this->auto_blocking_enabled = Parsing\sanitize_bool(gdwl()->settings()->get_value_bool(OPTION_ONETRUST_AUTO_BLOCK, true));
         $this->group_id_necessary = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_GROUP_NECESSARY, 'C0001'));
         $this->group_id_performance = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_GROUP_PERFORMANCE, 'C0002'));
         $this->group_id_functional = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_GROUP_FUNCTIONAL, 'C0003'));
         $this->group_id_targeting = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_GROUP_TARGETING, 'C0004'));
         $this->group_id_social = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_GROUP_SOCIAL, 'C0005'));
+
+        // Debug Settings
+        $this->is_debug_mode = Parsing\sanitize_bool(gdwl()->settings()->get_value_bool(OPTION_ONETRUST_DEBUG_MODE, false));
+        $this->debug_domain = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_DEBUG_DOMAIN, ''));
 
         // Third-Party Integrations
         $this->hotjar_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_HOTJAR_ID, ''));
@@ -102,7 +129,8 @@ class OneTrust {
 
 
         // Setup Hooks
-        add_action('wp_head', array($this, 'output_wrapper_script'), 1);
+        add_action('gdwl_on_environment_changed', array($this, 'on_environment_changed'), 10, 2);
+        add_action('wp_head', array($this, 'output_banner_script'), 0);
         add_action('wp_head', array($this, 'output_header_tags'), 10);
         add_action('wp_body_open', array($this, 'output_body_tags'), 0);
     }
@@ -115,9 +143,24 @@ class OneTrust {
     //--------------------------------------------
     //<editor-fold desc="Methods">
 
-    public function output_wrapper_script() {
-        echo PHP_EOL;
-        ?>
+    /**
+     * Outputs the header script for the OneTrust banner functionality. Will automatically output the test scripts if
+     * debug mode is enabled.
+     * @return void
+     */
+    public function output_banner_script() {
+        if (!$this->is_enabled || Strings\is_null_or_empty($this->domain_id)) {
+            return;
+        }
+        $urlparts = parse_url(home_url());
+        $domain = $urlparts['host'];
+        $domain_key = trim($this->domain_id) . ($this->is_debug_mode ? '-test' : '');
+?>
+        <!-- OneTrust Cookies Consent Notice start for <?php echo $domain; ?> -->
+        <?php if ($this->auto_blocking_enabled) : ?>
+        <script type="text/javascript" src="https://cdn.cookielaw.org/consent/<?php echo $domain_key; ?>/OtAutoBlock.js" ></script>
+        <?php endif; ?>
+        <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="<?php echo $domain_key; ?>" ></script>
         <script type="text/javascript">
             function OptanonWrapper() {
                 // Get initial OnetrustActiveGroups ids
@@ -132,21 +175,21 @@ class OneTrust {
                 function otGetInitialGrps(){
                     OptanonWrapperCount = '';
                     otIniGrps =  OnetrustActiveGroups;
-                    console.log("otGetInitialGrps", otIniGrps);
+                    log(otIniGrps, "otGetInitialGrps");
                 }
 
                 function otDeleteCookie(iniOptGrpId)
                 {
                     var otDomainGrps = JSON.parse(JSON.stringify(Optanon.GetDomainData().Groups));
-                    console.log("otDomainGrps", otDomainGrps);
+                    log(otDomainGrps, "otDomainGrps");
                     var otDeletedGrpIds = otGetInactiveId(iniOptGrpId, OnetrustActiveGroups);
-                    console.log("otDeletedGrpIds", otDeletedGrpIds);
+                    log(otDeletedGrpIds, "otDeletedGrpIds");
                     if(otDeletedGrpIds.length != 0 && otDomainGrps.length !=0){
                         for(var i=0; i < otDomainGrps.length; i++){
                             //Check if CustomGroupId matches
                             if(otDomainGrps[i]['CustomGroupId'] != '' && otDeletedGrpIds.includes(otDomainGrps[i]['CustomGroupId'])){
                                 for(var j=0; j < otDomainGrps[i]['Cookies'].length; j++){
-                                    console.log("otDeleteCookie",otDomainGrps[i]['Cookies'][j]['Name']);
+                                    log(otDomainGrps[i]['Cookies'][j]['Name'], "otDeleteCookie");
                                     //Delete cookie
                                     eraseCookie(otDomainGrps[i]['Cookies'][j]['Name'], otDomainGrps[i]['Cookies'][j]['Host']);
                                 }
@@ -173,7 +216,7 @@ class OneTrust {
                 //Get inactive ids
                 function otGetInactiveId(customIniId, otActiveGrp){
                     //Initial OnetrustActiveGroups
-                    console.log("otGetInactiveId",customIniId);
+                    log(customIniId, "otGetInactiveId");
                     customIniId = customIniId.split(",");
                     customIniId = customIniId.filter(Boolean);
 
@@ -192,93 +235,64 @@ class OneTrust {
 
                 //Delete cookie
                 function eraseCookie(name, domain) {
-                    console.log("eraseCookie called on '" + name + "'");
+                    log("eraseCookie called on '" + name + "'");
                     //Delete root path cookies
                     if (typeof(domain) == 'undefined' || domain == null) {
                         domain = location.hostname;
                     }
-
-                    //!!!DEBUG
-                    if (domain === 'ioglstaging.wpengine.com') {
+                    <?php if ($this->is_debug_mode && !Strings\is_null_or_empty($this->debug_domain)) : ?>
+                    if (domain === '<?php echo $this->debug_domain; ?>') {
                         domain = location.hostname;
                     }
-                    //!!! END DEBUG
-
-                    // Check for dynamic cookie names
-                    let names = [];
-                    const regex = /(xxx(?:x)*)/;
-                    const dynamicPos = name.search(regex);
-                    if (dynamicPos !== -1) {
-                        console.log(name + " is a dynamic cookie");
-                        const cookieNames = getCookieNames();
-                        const nonDynamic = name.slice(0, dynamicPos);
-                        const dLength = (name.substring(dynamicPos)).length;
-                        for (let i = 0; i < cookieNames.length; ++i) {
-                            if (cookieNames[i].startsWith(nonDynamic)) {
-                                const cookieVar = cookieNames[i].substring(dynamicPos);
-                                console.log(cookieNames[i] + " could be a match [" + cookieVar + "] | [" + name.substring(dynamicPos) + "]");
-                                if (cookieVar.length <= dLength) {
-                                    console.log(cookieNames[i] + " is a match for " + name);
-                                    names.push(cookieNames[i]);
-                                }
-                            }
-                        }
-                        console.log(cookieNames);
+                    <?php endif; ?>
+                    //domainName = window.location.hostname;
+                    document.cookie = name+'=; Max-Age=-99999999; Path=/;Domain='+ domain;
+                    log('Cookie - Trying to delete ' + name + ' for domain ' + domain);
+                    document.cookie = name+'=; Max-Age=-99999999; Path=/;Domain=.'+ domain;
+                    log('Cookie - Trying to delete ' + name + ' for domain .' + domain);
+                    document.cookie = name+'=; Max-Age=-99999999; Path=/;Domain=.wpengine.com';
+                    log('Cookie - Trying to delete ' + name + ' for domain .wpengine.com');
+                    //Delete LSO incase LSO being used, cna be commented out.
+                    const lSto = localStorage.getItem(name);
+                    if (lSto !== null) {
+                        log('Local Storage - Removing ' + name);
+                        localStorage.removeItem(name);
                     } else {
-                        names.push(name);
+                        log('Local Storage - Could not find ' + name);
                     }
 
-
-
-                    //Iterate over the cookie name matches and attempt removal
-
-                    for (let i = 0; i < names.length; ++i) {
-                        const cookieName = names[i];
-
-                        //domainName = window.location.hostname;
-                        document.cookie = cookieName+'=; Max-Age=-99999999; Path=/;Domain='+ domain;
-                        console.log('Cookie - Trying to delete ' + cookieName + ' for domain ' + domain);
-
-                        //Delete LSO incase LSO being used, cna be commented out.
-                        const lSto = localStorage.getItem(cookieName);
-                        if (lSto !== null) {
-                            console.log('Local Storage - Removing ' + cookieName);
-                        } else {
-                            console.log('Local Storage - Could not find ' + cookieName);
-                        }
-                        localStorage.removeItem(cookieName);
-
-                        //Check for the current path of the page
-                        const pathArray = window.location.pathname.split('/');
-                        //Loop through path hierarchy and delete potential cookies at each path.
-                        for (let j=0; j < pathArray.length; j++){
-                            if (pathArray[j]){
-                                //Build the path string from the Path Array e.g /site/login
-                                const currentPath = pathArray.slice(0,j+1).join('/');
-                                document.cookie = cookieName+'=; Max-Age=-99999999; Path=' + currentPath + ';Domain='+ domain;
-                                //Maybe path has a trailing slash!
-                                document.cookie = cookieName+'=; Max-Age=-99999999; Path=' + currentPath + '/;Domain='+ domain;
-                            }
+                    //Check for the current path of the page
+                    const pathArray = window.location.pathname.split('/');
+                    //Loop through path hierarchy and delete potential cookies at each path.
+                    for (let j=0; j < pathArray.length; j++){
+                        if (pathArray[j]){
+                            //Build the path string from the Path Array e.g /site/login
+                            const currentPath = pathArray.slice(0,j+1).join('/');
+                            document.cookie = name+'=; Max-Age=-99999999; Path=' + currentPath + ';Domain='+ domain;
+                            //Maybe path has a trailing slash!
+                            document.cookie = name+'=; Max-Age=-99999999; Path=' + currentPath + '/;Domain='+ domain;
                         }
                     }
                 }
 
-                function getCookieNames() {
-                    let decodedCookie = decodeURIComponent(document.cookie);
-                    let ca = decodedCookie.split(';');
-                    let ret = [];
-                    for (let i = 0; i < ca.length; ++i) {
-                        let pos = ca[i].indexOf("=");
-                        ret.push(ca[i].slice(0, pos).trim());
+                function log(value, context) {
+                    <?php if ($this->is_debug_mode) : ?>
+                    if (typeof(context) === 'undefined' || context == null) {
+                        context = '';
                     }
-                    return ret;
+                    console.log('::[OneTrust Cookie Banner]:: - ' + context, value);
+                    <?php endif; ?>
                 }
             }
         </script>
-        <?php
-        echo PHP_EOL;
+        <!-- OneTrust Cookies Consent Notice end for <?php echo $domain; ?> -->
+<?php
     }
 
+    /**
+     * Outputs script tags for third-party integrations using OneTrust blocking mechanism for the header.
+     * @return void
+     */
     public function output_header_tags() {
         echo PHP_EOL; //Newline to start the block
 
@@ -314,7 +328,7 @@ class OneTrust {
         <?php endif; ?>
         <?php if (!Strings\is_null_or_empty($this->hotjar_id)) : ?>
         <!-- Hotjar Tracking Code for https://ioglstaging.wpengine.com/ -->
-        <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_performance; ?>">
+        <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_targeting; ?>">
         (function(h,o,t,j,a,r){
             h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
             h._hjSettings={hjid:<?php echo $this->hotjar_id; ?>,hjsv:6};
@@ -328,22 +342,20 @@ class OneTrust {
         <?php endif; ?>
         <?php if (!Strings\is_null_or_empty($this->facebook_pixel_id)) : ?>
         <!-- Facebook Pixel Code -->
-        <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_performance; ?>">
+        <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_targeting; ?>">
             !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
                 n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
                 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
                 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
                 document,'script','https://connect.facebook.net/en_US/fbevents.js');
         </script>
-        <!-- End Facebook Pixel Code -->
-        <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_performance; ?>">
+        <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_targeting; ?>">
             fbq('init', '<?php echo $this->facebook_pixel_id; ?>', {}, {
                 "agent": "wordpress-6.1.1-3.0.6"
             });
-        </script><script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_performance; ?>">
+        </script><script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_targeting; ?>">
             fbq('track', 'PageView', []);
         </script>
-        <!-- Facebook Pixel Code -->
         <noscript>
             <img height="1" width="1" style="display:none" alt="fbpx"
                  src="https://www.facebook.com/tr?id=<?php echo $this->facebook_pixel_id; ?>&ev=PageView&noscript=1" />
@@ -354,6 +366,10 @@ class OneTrust {
         echo PHP_EOL; //Newline to end the block
     }
 
+    /**
+     * Outputs script tags for third-party integrations using OneTrust blocking mechanism for the body.
+     * @return void
+     */
     public function output_body_tags() {
         echo PHP_EOL; //Newline to start the block
         $src = ($this->is_enabled ? 'data-src' : 'src');
@@ -367,6 +383,42 @@ class OneTrust {
 <?php
         endif;
         echo PHP_EOL; //Newline to end the block
+    }
+
+    /**
+     * Event called when the site environment changes due to staging being pushed to production via WPEngine
+     * @param $prev
+     * @param $cur
+     */
+    public function on_environment_changed($prev = 1, $cur = 0) {
+        $env_prev = ($prev === -1 ? 'UNSET' : gdwl()->get_environment_by_index($prev));
+        $env_new = gdwl()->get_environment_by_index($cur);
+
+        Debug::log(__METHOD__ . '() - Environment Changed from [col=yellow]' . $env_prev . '[/col] to [col=green]' . $env_new . '[/col]');
+
+        // Only proceed if this is the Production Environment
+        if ($cur !== 0) {
+            return;
+        }
+
+        // Revert Debug Mode and Debug Domain to prevent issues on Production
+        $set_debug = gdwl()->settings()->get_setting(OPTION_ONETRUST_DEBUG_MODE);
+        $set_domain = gdwl()->settings()->get_setting(OPTION_ONETRUST_DEBUG_DOMAIN);
+
+        $sDEBUG = "\n" . '========== Reverting Debug Settings ==========' . "\n";
+
+        if ($set_debug != null) {
+            $old_value = $set_debug->get_value();
+            $set_debug->set_value(false);
+            $sDEBUG .= '[col=white][b]Debug Mode[/b][/col]: [col=yellow]' . $old_value . '[/col] >> [col=green]false[/col]';
+        }
+        if ($set_domain != null) {
+            $old_value = $set_domain->get_value();
+            $set_domain->set_value('');
+            $sDEBUG .= '[col=white][b]Debug Mode[/b][/col]: [col=yellow]"' . $old_value . '"[/col] >> [col=green]""[/col]';
+        }
+        $sDEBUG .= '========== DONE Reverting Debug Settings ==========' . "\n";
+        Debug::log(__METHOD__ . '() - ' . $sDEBUG);
     }
 
     //</editor-fold> Methods
