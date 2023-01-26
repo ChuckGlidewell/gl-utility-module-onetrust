@@ -104,7 +104,27 @@ class OneTrust {
      * Main class constructor
      */
     public function __construct() {
+        // Setup Hooks
+        add_action('gdwl_settings_loaded', array($this, 'load_settings'));
+        add_action('gdwl_on_environment_changed', array($this, 'on_environment_changed'), 10, 2);
+        add_action('wp_head', array($this, 'output_banner_script'), 0);
+        add_action('wp_head', array($this, 'output_header_tags'), 10);
+        add_action('wp_body_open', array($this, 'output_body_tags'), 0);
+    }
 
+    //</editor-fold> Initialization
+
+
+    //--------------------------------------------
+    // Methods
+    //--------------------------------------------
+    //<editor-fold desc="Methods">
+
+    /**
+     * Loads the settings for the OneTrust integration
+     * @return void
+     */
+    public function load_settings() {
         // OneTrust Settings Fields
         $this->is_enabled = Parsing\sanitize_bool(gdwl()->settings()->get_value_bool(OPTION_ONETRUST_ENABLED, false));
         $this->domain_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_ONETRUST_DOMAIN_ID, ''));
@@ -126,22 +146,7 @@ class OneTrust {
         $this->facebook_pixel_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_FB_PIXEL_ID, ''));
 
         $this->js_type = ($this->is_enabled ? 'text/plain' : 'text/javascript');
-
-
-        // Setup Hooks
-        add_action('gdwl_on_environment_changed', array($this, 'on_environment_changed'), 10, 2);
-        add_action('wp_head', array($this, 'output_banner_script'), 0);
-        add_action('wp_head', array($this, 'output_header_tags'), 10);
-        add_action('wp_body_open', array($this, 'output_body_tags'), 0);
     }
-
-    //</editor-fold> Initialization
-
-
-    //--------------------------------------------
-    // Methods
-    //--------------------------------------------
-    //<editor-fold desc="Methods">
 
     /**
      * Outputs the header script for the OneTrust banner functionality. Will automatically output the test scripts if
