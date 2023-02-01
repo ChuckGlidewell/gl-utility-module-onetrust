@@ -173,7 +173,6 @@ class OneTrust {
                 "testMode": <?php echo $this->is_debug_mode ? 'true' : 'false'; ?>
             };
             function OptanonWrapper() {
-                console.log("I think I get called too early?!");
                 var event = new Event('optanonUpdated', {
                     bubbles: true,
                     cancelable: true,
