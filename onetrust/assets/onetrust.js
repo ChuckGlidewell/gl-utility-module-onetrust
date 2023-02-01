@@ -2,7 +2,6 @@
  * This function is called by the OneTrust cookie banner integration whenever the
  * user changes their preferences for cookies in the Preference Center.
  */
-console.log("GD IT!");
 function OnOptanonUpdate() {
     // Do not proceed if the oneTrustData object does not exist
     if (typeof oneTrustData == 'undefined' || oneTrustData == null) {
