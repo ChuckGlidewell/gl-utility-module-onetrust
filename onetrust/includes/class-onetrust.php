@@ -107,6 +107,7 @@ class OneTrust {
         // Setup Hooks
         add_action('gdwl_settings_loaded', array($this, 'load_settings'));
         add_action('gdwl_on_environment_changed', array($this, 'on_environment_changed'), 10, 2);
+        gdwl()->load_script('gdwl-onetrust-script', 'modules/onetrust/assets/onetrust.js', array(), false);
         add_action('wp_head', array($this, 'output_banner_script'), 0);
         add_action('wp_head', array($this, 'output_header_tags'), 10);
         add_action('wp_body_open', array($this, 'output_body_tags'), 0);
@@ -167,127 +168,18 @@ class OneTrust {
         <?php endif; ?>
         <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="<?php echo $domain_key; ?>" ></script>
         <script type="text/javascript">
+            var oneTrustData = {
+                "domain": "<?php echo $this->debug_domain ?>",
+                "testMode": <?php echo $this->is_debug_mode ? 'true' : 'false'; ?>
+            };
             function OptanonWrapper() {
-                // Get initial OnetrustActiveGroups ids
-                if(typeof OptanonWrapperCount == "undefined"){
-                    otGetInitialGrps();
-                }
-
-                //Delete cookies
-                otDeleteCookie(otIniGrps);
-
-                // Assign OnetrustActiveGroups to custom variable
-                function otGetInitialGrps(){
-                    OptanonWrapperCount = '';
-                    otIniGrps =  OnetrustActiveGroups;
-                    log(otIniGrps, "otGetInitialGrps");
-                }
-
-                function otDeleteCookie(iniOptGrpId)
-                {
-                    var otDomainGrps = JSON.parse(JSON.stringify(Optanon.GetDomainData().Groups));
-                    log(otDomainGrps, "otDomainGrps");
-                    var otDeletedGrpIds = otGetInactiveId(iniOptGrpId, OnetrustActiveGroups);
-                    log(otDeletedGrpIds, "otDeletedGrpIds");
-                    if(otDeletedGrpIds.length != 0 && otDomainGrps.length !=0){
-                        for(var i=0; i < otDomainGrps.length; i++){
-                            //Check if CustomGroupId matches
-                            if(otDomainGrps[i]['CustomGroupId'] != '' && otDeletedGrpIds.includes(otDomainGrps[i]['CustomGroupId'])){
-                                for(var j=0; j < otDomainGrps[i]['Cookies'].length; j++){
-                                    log(otDomainGrps[i]['Cookies'][j]['Name'], "otDeleteCookie");
-                                    //Delete cookie
-                                    eraseCookie(otDomainGrps[i]['Cookies'][j]['Name'], otDomainGrps[i]['Cookies'][j]['Host']);
-                                }
-                            }
-
-                            //Check if Hostid matches
-                            if(otDomainGrps[i]['Hosts'].length != 0){
-                                for(var j=0; j < otDomainGrps[i]['Hosts'].length; j++){
-                                    //Check if HostId presents in the deleted list and cookie array is not blank
-                                    if(otDeletedGrpIds.includes(otDomainGrps[i]['Hosts'][j]['HostId']) && otDomainGrps[i]['Hosts'][j]['Cookies'].length !=0){
-                                        for(var k=0; k < otDomainGrps[i]['Hosts'][j]['Cookies'].length; k++){
-                                            //Delete cookie
-                                            eraseCookie(otDomainGrps[i]['Hosts'][j]['Cookies'][k]['Name'], otDomainGrps[i]['Hosts'][j]['Cookies'][k]['Host']);
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-                    otGetInitialGrps(); //Reassign new group ids
-                }
-
-                //Get inactive ids
-                function otGetInactiveId(customIniId, otActiveGrp){
-                    //Initial OnetrustActiveGroups
-                    log(customIniId, "otGetInactiveId");
-                    customIniId = customIniId.split(",");
-                    customIniId = customIniId.filter(Boolean);
-
-                    //After action OnetrustActiveGroups
-                    otActiveGrp = otActiveGrp.split(",");
-                    otActiveGrp = otActiveGrp.filter(Boolean);
-
-                    var result=[];
-                    for (var i=0; i < customIniId.length; i++){
-                        if ( otActiveGrp.indexOf(customIniId[i]) <= -1 ){
-                            result.push(customIniId[i]);
-                        }
-                    }
-                    return result;
-                }
-
-                //Delete cookie
-                function eraseCookie(name, domain) {
-                    log("eraseCookie called on '" + name + "'");
-                    //Delete root path cookies
-                    if (typeof(domain) == 'undefined' || domain == null) {
-                        domain = location.hostname;
-                    }
-                    <?php if ($this->is_debug_mode && !Strings\is_null_or_empty($this->debug_domain)) : ?>
-                    if (domain === '<?php echo $this->debug_domain; ?>') {
-                        domain = location.hostname;
-                    }
-                    <?php endif; ?>
-                    //domainName = window.location.hostname;
-                    document.cookie = name+'=; Max-Age=-99999999; Path=/;Domain='+ domain;
-                    log('Cookie - Trying to delete ' + name + ' for domain ' + domain);
-                    document.cookie = name+'=; Max-Age=-99999999; Path=/;Domain=.'+ domain;
-                    log('Cookie - Trying to delete ' + name + ' for domain .' + domain);
-                    document.cookie = name+'=; Max-Age=-99999999; Path=/;Domain=.wpengine.com';
-                    log('Cookie - Trying to delete ' + name + ' for domain .wpengine.com');
-                    //Delete LSO incase LSO being used, cna be commented out.
-                    const lSto = localStorage.getItem(name);
-                    if (lSto !== null) {
-                        log('Local Storage - Removing ' + name);
-                        localStorage.removeItem(name);
-                    } else {
-                        log('Local Storage - Could not find ' + name);
-                    }
-
-                    //Check for the current path of the page
-                    const pathArray = window.location.pathname.split('/');
-                    //Loop through path hierarchy and delete potential cookies at each path.
-                    for (let j=0; j < pathArray.length; j++){
-                        if (pathArray[j]){
-                            //Build the path string from the Path Array e.g /site/login
-                            const currentPath = pathArray.slice(0,j+1).join('/');
-                            document.cookie = name+'=; Max-Age=-99999999; Path=' + currentPath + ';Domain='+ domain;
-                            //Maybe path has a trailing slash!
-                            document.cookie = name+'=; Max-Age=-99999999; Path=' + currentPath + '/;Domain='+ domain;
-                        }
-                    }
-                }
-
-                function log(value, context) {
-                    <?php if ($this->is_debug_mode) : ?>
-                    if (typeof(context) === 'undefined' || context == null) {
-                        context = '';
-                    }
-                    console.log('::[OneTrust Cookie Banner]:: - ' + context, value);
-                    <?php endif; ?>
-                }
+                console.log("I think I get called too early?!");
+                var event = new Event('optanonUpdated', {
+                    bubbles: true,
+                    cancelable: true,
+                    composed: false
+                });
+                window.dispatchEvent(event);
             }
         </script>
         <!-- OneTrust Cookies Consent Notice end for <?php echo $domain; ?> -->
