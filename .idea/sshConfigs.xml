@@ -8,6 +8,16 @@
       <sshConfig authType="PASSWORD" host="ioglstaging.sftp.wpengine.com" id="e32855a3-eb0e-4e07-b0be-18e6001e580d" port="2222" nameFormat="DESCRIPTIVE" username="ioglstaging-chuck" useOpenSSHConfig="true" />
       <sshConfig authType="PASSWORD" host="nw2018wpe.sftp.wpengine.com" id="1f4fcc1a-276a-49d6-b718-2b89438a0369" port="2222" nameFormat="DESCRIPTIVE" username="nw2018wpe-chuck" useOpenSSHConfig="true" />
       <sshConfig authType="PASSWORD" host="rdc2018.sftp.wpengine.com" id="c8a18fea-b6e6-49fc-ab32-4887d342ba81" port="2222" nameFormat="DESCRIPTIVE" username="rdc2018-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="crowndevs.sftp.wpengine.com" id="d566c4fd-4102-4287-a97e-7c3010f4afff" port="2222" nameFormat="DESCRIPTIVE" username="crowndevs-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="crownstage.sftp.wpengine.com" id="2204ac14-1633-454c-bf39-3c8e435da172" port="2222" nameFormat="DESCRIPTIVE" username="crownstage-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="lasvegasdev.sftp.wpengine.com" id="ebcb1ec4-54fe-4bb8-8c6b-e333993647be" port="2222" nameFormat="DESCRIPTIVE" username="lasvegasdev-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="lvddsstaging.sftp.wpengine.com" id="e2ca111e-7a74-4900-8132-f5007a9fc70e" port="2222" nameFormat="DESCRIPTIVE" username="lvddsstaging-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="dtdr2018stage.sftp.wpengine.com" id="2003255d-f308-430c-921a-ef042c35516a" port="2222" nameFormat="DESCRIPTIVE" username="dtdr2018stage-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="glstageoffers.sftp.wpengine.com" id="485527b7-1bcc-4be1-b056-35977adde9c6" port="2222" nameFormat="DESCRIPTIVE" username="glstageoffers-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="gdsymstaging.sftp.wpengine.com" id="0c915c56-8771-4f3c-9ade-a9439f716aab" port="2222" nameFormat="DESCRIPTIVE" username="gdsymstaging-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="gleadersstage.sftp.wpengine.com" id="dc098c5e-3131-47cf-b1fc-29777408d3ec" port="2222" nameFormat="DESCRIPTIVE" username="gleadersstage-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="pe2018staging.sftp.wpengine.com" id="0853e39f-ebb3-427f-be8a-80f92efe43cb" port="2222" nameFormat="DESCRIPTIVE" username="pe2018staging-chuck" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="ssdentalstagin.sftp.wpengine.com" id="105a6fbd-7a42-443e-ae3c-0d7f5feebca3" port="2222" nameFormat="DESCRIPTIVE" username="ssdentalstagin-chuck" useOpenSSHConfig="true" />
     </configs>
   </component>
 </project>
