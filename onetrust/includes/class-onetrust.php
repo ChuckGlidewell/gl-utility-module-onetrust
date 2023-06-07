@@ -223,7 +223,7 @@ class OneTrust {
         <!-- End Google Tag Manager -->
         <?php endif; ?>
         <?php if (!Strings\is_null_or_empty($this->hotjar_id)) : ?>
-        <!-- Hotjar Tracking Code for https://ioglstaging.wpengine.com/ -->
+        <!-- Hotjar Tracking Code -->
         <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_targeting; ?>">
         (function(h,o,t,j,a,r){
             h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};

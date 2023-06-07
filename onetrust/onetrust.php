@@ -2,7 +2,7 @@
 namespace Glidewell\Vendors\OneTrust;
 if(!defined('ABSPATH')) {exit;}
 
-//Usings
+//Usings go here
 
 
 //--------------------------------------------

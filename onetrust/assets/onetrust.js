@@ -176,6 +176,8 @@ function OnOptanonUpdate() {
         log(otDomainGrps, "otDomainGrps");
 
         if(groupIds.length != 0 && otDomainGrps.length !=0){
+            log("There are groups to delete.....");
+
             for(var i=0; i < otDomainGrps.length; i++){
                 //Check if CustomGroupId matches
                 if(otDomainGrps[i]['CustomGroupId'] != '' && groupIds.includes(otDomainGrps[i]['CustomGroupId'])){
@@ -200,7 +202,16 @@ function OnOptanonUpdate() {
                 }
 
             }
+
+            // Handle custom targeting cookies here
+            log('Removing custom targeting cookies....');
+            eraseCookie('_fbp', location.hostname);
+            eraseCookie('_gid', location.hostname);
+
         }
+
+
+
         otGetInitialGrps(); //Reassign new group ids
     }
 
