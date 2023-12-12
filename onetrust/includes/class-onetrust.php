@@ -268,12 +268,11 @@ class OneTrust {
      */
     public function output_body_tags() {
         echo PHP_EOL; //Newline to start the block
-        $src = ($this->is_enabled ? 'data-src' : 'src');
         $iClass = ($this->is_enabled ? 'class="optanon-category-' . $this->group_id_performance . '"' : '');
 
         if (!Strings\is_null_or_empty($this->google_tag_manager_id)) : ?>
         <!-- Google Tag Manager (noscript) -->
-        <noscript><iframe <?php echo $src; ?>="https://www.googletagmanager.com/ns.html?id=<?php echo $this->google_tag_manager_id; ?>"
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo $this->google_tag_manager_id; ?>"
                           height="0" width="0" style="display:none;visibility:hidden" <?php echo $iClass; ?>></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
 <?php
