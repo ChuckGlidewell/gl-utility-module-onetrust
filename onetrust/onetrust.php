@@ -13,6 +13,7 @@ const OPTION_HOTJAR_ID = 'tag_id_hotjar';
 const OPTION_GA_ID = 'tag_id_google_analytics';
 const OPTION_GTAG_ID = 'tag_id_google_tag_manager';
 const OPTION_FB_PIXEL_ID = 'tag_id_facebook_pixel';
+const OPTION_HUBSPOT_ID = 'tag_id_hubspot';
 
 
 const OPTION_ONETRUST_ENABLED = 'onetrust_enabled';

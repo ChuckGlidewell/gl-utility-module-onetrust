@@ -24,6 +24,7 @@ function populate_settings($settings) {
         $settings[] = new Gdwl_Setting_Text('Google Analytics Property ID', OneTrust\OPTION_GA_ID, OneTrust\OPTION_GA_ID, '', 'The ID of the Google Analytics property for this site', 'integration');
         $settings[] = new Gdwl_Setting_Text('Google Tag Manager Container ID', OneTrust\OPTION_GTAG_ID, OneTrust\OPTION_GTAG_ID, '', 'The ID of the container in Google Tag Manager for this site', 'integration');
         $settings[] = new Gdwl_Setting_Text('Facebook Pixel ID', OneTrust\OPTION_FB_PIXEL_ID, OneTrust\OPTION_FB_PIXEL_ID, '', 'The Facebook Pixel ID for this site', 'integration');
+        $settings[] = new Gdwl_Setting_Text('HubSpot ID', OneTrust\OPTION_HUBSPOT_ID, OneTrust\OPTION_HUBSPOT_ID, '', 'The account number used for the HubSpot integration tag', 'integration');
 
         // OneTrust Cookie Banner
         //$settings[] = new Gdwl_Setting_Text('', '', '', '', '', 'onetrust'); OPTION_ONETRUST_AUTO_BLOCK

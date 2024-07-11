@@ -91,6 +91,11 @@ class OneTrust {
      * @var string
      */
     public $facebook_pixel_id = '';
+    /**
+     * The HubSpot account ID
+     * @var string
+     */
+    public $hubspot_id = '';
 
     //</editor-fold> Fields
 
@@ -145,6 +150,7 @@ class OneTrust {
         $this->google_analytics_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_GA_ID, ''));
         $this->google_tag_manager_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_GTAG_ID, ''));
         $this->facebook_pixel_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_FB_PIXEL_ID, ''));
+        $this->hubspot_id = sanitize_text_field(gdwl()->settings()->get_value_string(OPTION_HUBSPOT_ID, ''));
 
         $this->js_type = ($this->is_enabled ? 'text/plain' : 'text/javascript');
     }
@@ -257,6 +263,11 @@ class OneTrust {
                  src="https://www.facebook.com/tr?id=<?php echo $this->facebook_pixel_id; ?>&ev=PageView&noscript=1" />
         </noscript>
         <!-- End Facebook Pixel Code -->
+        <?php endif; ?>
+        <?php if (!Strings\is_null_or_empty($this->hubspot_id)) : ?>
+        <!-- HubSpot Integration -->
+            <script type="<?php echo $this->js_type;?>" class="<?php echo $class_grp_targeting; ?>" id="hs-script-loader" async defer src="//js.hs-scripts.com/<?php echo $this->hubspot_id; ?>.js"></script>
+        <!-- End HubSpot Integration -->
         <?php endif; ?>
         <?php
         echo PHP_EOL; //Newline to end the block
